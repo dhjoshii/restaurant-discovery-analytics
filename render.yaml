@@ -1,0 +1,17 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Dashboard → New → Blueprint → pick this repository → paste MONGODB_URI when asked.
+services:
+  - type: web
+    name: zaika-restaurants
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: MONGODB_URI
+        sync: false # secret: entered in the Render dashboard, never committed
+      - key: MONGODB_DB
+        value: sample_restaurants
+      - key: MONGODB_COLLECTION
+        value: india_restaurants

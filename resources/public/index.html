@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zaika · Restaurant Discovery</title>
+  <meta name="description" content="Zaika — Restaurant Discovery & Analytics System. Scala 3 + MongoDB over restaurants across India.">
+  <meta name="theme-color" content="#f6ecd9">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Fonts load without blocking rendering or scripts -->
+  <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Mukta:wght@400;500;600;700&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Mukta:wght@400;500;600;700&family=Caveat:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
+  <script>
+    // Scroll-reveal styles only apply once we know JavaScript runs.
+    document.documentElement.classList.add('js');
+    try { var t = localStorage.getItem('zaika-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); else if (window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <!-- Rough.js draws the sketchy charts; the page still works if it fails to load -->
+  <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js" defer></script>
+</head>
+<body>
+  <!-- Icon sprite (round caps for a hand-drawn feel) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-search" viewBox="0 0 24 24"><path d="M10.5 4.2c3.6-.3 6.4 2.4 6.3 5.9-.1 3.4-2.9 6.2-6.4 6.1-3.4-.1-6.1-2.9-6-6.3.1-3.1 2.6-5.6 6.1-5.7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m15.4 15.6 4.8 4.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12.2 4.8c-.2 4.8 0 9.6-.3 14.4M4.9 12.3c4.7-.3 9.5.2 14.2-.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 8.2c2.2-.1 3.9 1.6 3.8 3.8 0 2.1-1.8 3.9-3.9 3.8-2.1 0-3.8-1.8-3.7-3.9.1-2 1.7-3.6 3.8-3.7z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.3M12 19.3v2.2M4.6 4.7l1.6 1.5M17.8 17.9l1.6 1.6M2.6 12.1h2.2M19.2 11.9h2.3M4.7 19.4l1.5-1.6M17.9 6.1l1.5-1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.6 14.3c-1.1 3.4-4.4 5.7-8 5.4-4.1-.3-7.3-3.8-7.1-7.9.2-3.5 2.6-6.3 5.9-7.2-1.2 1.6-1.6 3.7-1.1 5.7.8 3.4 4.2 5.6 7.7 4.9.9-.2 1.8-.5 2.6-.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.2 5.8c4 4.1 7.8 8.2 11.7 12.3M17.9 5.9c-4.1 4-8 8.1-11.9 12.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.2c-2.6-2.4-6.7-6.6-6.8-11.2C5.1 6.2 8.2 3 12 3.1c3.7.1 6.8 3.1 6.7 6.9 0 4.7-4.2 8.8-6.7 11.2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12.1 7.6c1.3 0 2.3 1 2.3 2.3 0 1.2-1.1 2.3-2.3 2.2-1.3 0-2.3-1-2.2-2.3 0-1.2 1-2.2 2.2-2.2z" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4.2 19.8c.3-1.4.5-2.9.9-4.3L15.7 4.9c1.2-.4 2.9 1.2 3.4 2.9L8.6 18.6c-1.5.4-2.9.9-4.4 1.2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.1 7.1c5.3-.3 10.6-.1 15.9-.1M9.8 11.2l.2 5.8M14.2 11l-.1 6M6.1 7.3c.4 4.3.6 8.6 1.1 12.9 3.3.2 6.4.2 9.7-.1.5-4.3.7-8.6 1.1-12.9M9.1 7c-.1-1.1-.1-2.3.2-3.4 1.8-.2 3.5-.1 5.3 0 .3 1.1.3 2.3.2 3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.2c1 2.2 1.8 4.4 2.9 6.5 2.3.2 4.6.4 6.9.8-1.7 1.6-3.5 3.1-5.2 4.7.5 2.3 1 4.5 1.4 6.8-2-1.2-4-2.4-6-3.5-2.1 1.2-4.1 2.3-6.1 3.5.5-2.3.9-4.6 1.4-6.8C5.6 13.6 3.9 12 2.2 10.4c2.3-.3 4.6-.5 6.9-.7 1-2.2 1.9-4.4 2.9-6.5z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+      <symbol id="i-clip" viewBox="0 0 24 24"><path d="M5.3 4.6c4.5-.2 9-.2 13.5 0 .3 5.4.2 10.8-.1 16.2-4.4.3-8.9.3-13.3 0-.3-5.4-.3-10.8-.1-16.2z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 4.4c.1-.6.1-1.1.2-1.6 1.9-.1 3.7-.1 5.6.1.1.5.1 1 .1 1.6M12 10.2v6.2M8.9 13.3h6.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-left" viewBox="0 0 24 24"><path d="M15.2 5.6c-2.2 2.2-4.2 4.3-6.3 6.5 2.1 2.1 4.2 4.1 6.4 6.3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-right" viewBox="0 0 24 24"><path d="M8.8 5.7c2.2 2.1 4.3 4.2 6.4 6.4-2.1 2.1-4.1 4.2-6.3 6.3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4.4 12.2c5-.3 10-.1 15-.2M13.6 6.3c1.9 1.9 4 3.8 5.9 5.8-2 1.9-3.9 3.8-5.9 5.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.4 2.9c-2.6 3.7-5.2 7.4-7.7 11.1h6.1c-.4 2.3-.7 4.6-1.1 6.9 2.7-3.7 5.3-7.4 7.9-11.1h-6.1c.3-2.3.6-4.6.9-6.9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.7 12.8c1.6 1.5 3.1 3 4.6 4.6 3.2-3.3 6.4-6.6 9.8-9.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 7.6v5.6M12 16.4v.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12.2 3.1c4.9.1 8.8 4.1 8.7 9-.1 4.9-4.1 8.8-9 8.7-4.9-.1-8.8-4.1-8.7-9 .1-4.8 4.1-8.7 9-8.7z" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+      <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.5 12.3c.1 4.3 3.7 7.9 8.1 7.7 4.3-.2 7.6-3.8 7.4-8.1-.2-4.3-3.8-7.6-8.2-7.4-2.2.1-4.2 1.1-5.6 2.7M4.3 3.9c.1 1.7 0 3.4.1 5.1 1.7.1 3.4 0 5.1 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bike" viewBox="0 0 24 24"><path d="M6 17.8c1.7 0 3-1.3 3-2.9 0-1.7-1.4-3-3.1-3-1.6 0-2.9 1.4-2.9 3 0 1.6 1.4 2.9 3 2.9zM18 17.8c1.6 0 3-1.3 3-2.9s-1.4-3-3.1-3c-1.6 0-2.9 1.4-2.9 3 0 1.6 1.4 2.9 3 2.9zM6 14.9l3.5-6.1h5.2l3.3 6.1M9.6 8.7 12 14.9h3M13.6 5.9h2.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-table" viewBox="0 0 24 24"><path d="M3.6 9.1c5.6-.3 11.2-.2 16.8 0M6.1 9.3l-1.4 9.8M17.9 9.2l1.4 9.9M12 9.4v9.6M8.4 14.6c2.4-.1 4.8-.1 7.2 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="paper" aria-hidden="true">
+    <span class="wash wash-a" data-parallax="0.10"></span>
+    <span class="wash wash-b" data-parallax="-0.06"></span>
+    <span class="wash wash-c" data-parallax="0.04"></span>
+    <span class="dots"></span>
+    <span class="grain"></span>
+  </div>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
+
+  <a class="skip-link" href="#explore">Skip to search</a>
+
+  <header class="nav" id="nav">
+    <div class="nav-inner sk">
+      <a class="brand" href="#top" aria-label="Zaika home">
+        <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+          <path class="chilli" d="M14 30c4 6 13 9 21 3 4-3 6-8 5-12-3 4-7 7-12 8-6 1-10 0-14 1z"/>
+          <path class="stem" d="M38 19c1-3 0-6-3-8M38 19c2-1 4-1 6 0"/>
+        </svg>
+        <span class="brand-word">Zaika</span>
+      </a>
+      <nav class="nav-links" aria-label="Sections">
+        <a href="#explore" data-nav="explore">Explore</a>
+        <a href="#analytics" data-nav="analytics">Analytics</a>
+        <a href="#indexes" data-nav="indexes">Indexes</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch light / dark paper">
+          <svg class="ico ico-sun"><use href="#i-sun"/></svg><svg class="ico ico-moon"><use href="#i-moon"/></svg>
+        </button>
+        <button class="btn btn-primary btn-sm" type="button" data-action="add">
+          <svg class="ico"><use href="#i-plus"/></svg><span>Add<span class="hide-sm"> restaurant</span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============================================================ HERO -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow sk" data-reveal>
+            <span class="live-dot" id="liveDot"></span>
+            <span id="liveText">Connecting to MongoDB…</span>
+          </p>
+          <h1 class="display" data-reveal style="--d:80ms">
+            Find where <span class="marker" id="heroWord">India</span> eats.
+          </h1>
+          <p class="hindi" data-reveal style="--d:140ms" id="heroHindi">भारत का ज़ायक़ा, एक खोज में।</p>
+          <p class="lead" data-reveal style="--d:200ms" id="heroLead">Search, curate and analyse restaurants and their ratings — built with Scala&nbsp;3 on MongoDB.</p>
+          <form class="hero-search sk" id="heroSearch" data-reveal style="--d:260ms" role="search">
+            <svg class="ico"><use href="#i-search"/></svg>
+            <input id="heroQuery" type="search" placeholder="Try “biryani”, “dhaba” or “café”" aria-label="Search restaurants by name" autocomplete="off">
+            <button class="btn btn-primary" type="submit"><span>Search</span><svg class="ico"><use href="#i-arrow"/></svg></button>
+          </form>
+          <p class="scribble-note" data-reveal style="--d:320ms" aria-hidden="true">
+            <svg viewBox="0 0 60 40"><path pathLength="1" d="M56 34C40 34 22 30 14 18 10 12 9 8 10 4M10 4 4 12M10 4l7 6"/></svg>
+            start here!
+          </p>
+          <div class="quick-chips" id="quickChips" data-reveal style="--d:360ms" aria-label="Quick filters"></div>
+        </div>
+
+        <div class="hero-art" id="heroArt" aria-hidden="true">
+          <svg class="doodle d-anise" viewBox="0 0 100 100"><path pathLength="1" d="M50 50 50 10M50 50 78 22M50 50 90 50M50 50 78 78M50 50 50 90M50 50 22 78M50 50 10 50M50 50 22 22M50 10c-6 10-6 20 0 40 6-20 6-30 0-40M90 50c-10-6-20-6-40 0 20 6 30 6 40 0M50 90c6-10 6-20 0-40-6 20-6 30 0 40M10 50c10 6 20 6 40 0-20-6-30-6-40 0"/></svg>
+          <svg class="doodle d-leaf" viewBox="0 0 100 60"><path pathLength="1" d="M4 30C30 2 70 2 96 30 70 58 30 58 4 30zM4 30h92M30 30l12-12M50 30l12-14M70 30l10-10M30 30l12 12M50 30l12 14M70 30l10 10"/></svg>
+          <svg class="doodle d-bowl" viewBox="0 0 120 100"><path pathLength="1" d="M10 50c4 30 96 30 100 0zM6 50h108M44 40c-6-8 6-14 0-24M60 40c-6-8 6-14 0-24M76 40c-6-8 6-14 0-24M50 86h20"/></svg>
+          <div class="note note-a" data-depth="16">
+            <p class="note-eyebrow">Top rated in India</p>
+            <p class="note-title" id="noteATitle">—</p>
+            <p class="note-sub" id="noteASub">&nbsp;</p>
+            <p class="note-big" id="noteABig">—</p>
+          </div>
+          <div class="note note-b" data-depth="-12">
+            <p class="note-eyebrow">Most loved cuisine</p>
+            <p class="note-title" id="noteBTitle">—</p>
+            <p class="note-sub" id="noteBSub">&nbsp;</p>
+          </div>
+          <div class="note note-c" data-depth="24">
+            <p class="note-eyebrow">Of rated places are “very good” or better</p>
+            <p class="note-big" id="noteCBig">—</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="stats" id="stats">
+          <div class="stat" data-reveal style="--d:0ms"><span class="stat-value" data-count="restaurants">—</span><span class="stat-label">Restaurants</span></div>
+          <div class="stat" data-reveal style="--d:90ms"><span class="stat-value" data-count="cities">—</span><span class="stat-label">Cities</span></div>
+          <div class="stat" data-reveal style="--d:180ms"><span class="stat-value" data-count="cuisines">—</span><span class="stat-label">Cuisines</span></div>
+          <div class="stat" data-reveal style="--d:270ms"><span class="stat-value" data-count="votes">—</span><span class="stat-label">Diner votes</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= EXPLORE -->
+    <section class="section" id="explore">
+      <div class="container">
+        <header class="section-head">
+          <span class="section-index" data-reveal>01</span>
+          <div>
+            <p class="section-hindi" data-reveal>खोजें</p>
+            <h2 class="section-title" data-split>Explore the menu</h2>
+            <svg class="scribble" viewBox="0 0 320 22" preserveAspectRatio="none" aria-hidden="true" data-reveal><path pathLength="1" d="M3 14C50 6 90 18 140 11S230 4 317 12"/></svg>
+            <p class="section-sub" data-reveal style="--d:120ms" id="exploreSub">Filter by name, city, cuisine, locality, rating, budget, delivery and table booking. Every query is answered by a MongoDB index — the plan is shown live.</p>
+          </div>
+        </header>
+
+        <form class="filters sk" id="filters" data-reveal autocomplete="off"></form>
+
+        <div class="results-meta" data-reveal>
+          <p id="resultSummary" aria-live="polite">Loading restaurants…</p>
+          <p class="plan-chip sk" id="planChip" hidden></p>
+        </div>
+
+        <div class="cards" id="cards" aria-busy="true"></div>
+
+        <nav class="pager" id="pager" aria-label="Pagination" hidden>
+          <button class="btn btn-sm" type="button" data-page="prev"><svg class="ico"><use href="#i-left"/></svg><span>Previous</span></button>
+          <span class="pager-info" id="pagerInfo"></span>
+          <button class="btn btn-sm" type="button" data-page="next"><span>Next</span><svg class="ico"><use href="#i-right"/></svg></button>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ======================================================= ANALYTICS -->
+    <section class="section" id="analytics">
+      <div class="container">
+        <header class="section-head">
+          <span class="section-index" data-reveal>02</span>
+          <div>
+            <p class="section-hindi" data-reveal>विश्लेषण</p>
+            <h2 class="section-title" data-split>Read the numbers</h2>
+            <svg class="scribble" viewBox="0 0 320 22" preserveAspectRatio="none" aria-hidden="true" data-reveal><path pathLength="1" d="M3 10C60 18 110 4 160 12S260 18 317 8"/></svg>
+            <p class="section-sub" data-reveal style="--d:120ms" id="analyticsSub">MongoDB aggregation pipelines over Indian restaurants, sketched by hand. Switch any card to its table or open the exact pipeline. Ratings use Zomato's 1–5 scale — higher is better.</p>
+          </div>
+        </header>
+
+        <div class="viz-filters sk" id="vizFilters" data-reveal></div>
+        <div class="viz-grid" id="vizGrid"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================= INDEXES -->
+    <section class="section" id="indexes">
+      <div class="container">
+        <header class="section-head">
+          <span class="section-index" data-reveal>03</span>
+          <div>
+            <p class="section-hindi" data-reveal>अनुक्रमणिका</p>
+            <h2 class="section-title" data-split>Under the hood</h2>
+            <svg class="scribble" viewBox="0 0 320 22" preserveAspectRatio="none" aria-hidden="true" data-reveal><path pathLength="1" d="M3 12C70 4 120 16 170 10S270 6 317 14"/></svg>
+            <p class="section-sub" data-reveal style="--d:120ms">The indexes behind every query, and a live <code>explain()</code> lab comparing the planner's choice against a forced collection scan.</p>
+          </div>
+        </header>
+
+        <div class="index-toolbar" data-reveal>
+          <p id="indexSummary">Loading indexes…</p>
+          <button class="btn btn-sm" type="button" id="ensureIndexes"><svg class="ico"><use href="#i-bolt"/></svg><span>Create / verify indexes</span></button>
+        </div>
+        <div class="index-grid" id="indexGrid"></div>
+
+        <div class="lab sk" data-reveal>
+          <header class="lab-head">
+            <h3>Explain lab</h3>
+            <p>Pick a query. It runs twice with <code>explain("executionStats")</code>.</p>
+          </header>
+          <div class="lab-presets" id="labPresets" role="tablist" aria-label="Query presets"></div>
+          <div class="lab-result" id="labResult"><p class="muted">Choose a query above.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <p class="footer-brand">Zaika<span>.</span></p>
+          <p class="muted">Restaurant Discovery &amp; Analytics System · Advanced Big Data Analytics</p>
+          <p class="muted small" id="footerData">Data: Zomato restaurants across 43 Indian cities, stored in MongoDB.</p>
+        </div>
+        <div class="footer-meta">
+          <p class="signature">Dhairya Joshi</p>
+          <p><strong>25162123003</strong> · BDA-75</p>
+          <p class="muted small">Scala 3 · Cask · MongoDB Java driver</p>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ================================================== DETAIL DRAWER -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer sk" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+    <div class="drawer-inner" id="drawerContent"></div>
+  </aside>
+
+  <!-- ========================================================= MODAL -->
+  <div class="modal-layer" id="modalLayer" hidden>
+    <div class="modal sk tape" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <datalist id="cuisineList"></datalist>
+  <datalist id="cityList"></datalist>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+# Secrets - never commit real credentials
+.env
+.env.*
+!.env.example
+
+# Scala CLI / Bloop / Metals build output
+.scala-build/
+.bsp/
+.bloop/
+.metals/
+.vscode/
+.idea/
+target/
+*.jar
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.log
+
+# Local tooling
+.claude/

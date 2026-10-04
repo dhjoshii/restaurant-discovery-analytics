@@ -1,0 +1,11 @@
+.env
+.env.*
+.git
+.scala-build
+.bsp
+.bloop
+.metals
+.idea
+.vscode
+docs
+*.jar
